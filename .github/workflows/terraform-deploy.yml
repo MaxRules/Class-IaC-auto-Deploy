@@ -15,6 +15,11 @@ jobs:
       contents: read
       id-token: write
 
+    # 👇 This ensures all Terraform commands run inside the terraform/ folder
+    defaults:
+      run:
+        working-directory: terraform
+
     steps:
       # 1️⃣ Checkout the repository
       - name: Checkout repository
@@ -36,9 +41,9 @@ jobs:
 
       # 4️⃣ Initialize Terraform
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
-      # 5️⃣ Validate Terraform
+      # 5️⃣ Validate Terraform configuration
       - name: Terraform Validate
         run: terraform validate
 
@@ -46,7 +51,7 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      # 7️⃣ Apply Terraform (auto-approve for demo)
+      # 7️⃣ Apply Terraform (only on main branch)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
